@@ -60,11 +60,11 @@ public class EasyPhotos {
      * @return
      */
     public static AlbumBuilder createAlbum(FragmentActivity activity, boolean isShowCamera, @NonNull ImageEngine imageEngine) {
-        return AlbumBuilder.createAlbum(activity, isShowCamera, imageEngine);
+        return AlbumBuilder.createAlbum(activity, isShowCamera, imageEngine).setOriginalMenu(false,true,"");
     }
 
     public static AlbumBuilder createAlbum(Fragment fragmentV, boolean isShowCamera, @NonNull ImageEngine imageEngine) {
-        return AlbumBuilder.createAlbum(fragmentV, isShowCamera, imageEngine);
+        return AlbumBuilder.createAlbum(fragmentV, isShowCamera, imageEngine).setOriginalMenu(false,true,"");
     }
 
 

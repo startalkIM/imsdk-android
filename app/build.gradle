@@ -112,5 +112,6 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     implementation 'androidx.appcompat:appcompat:1.0.0'
     testImplementation 'junit:junit:4.12'
+    implementation "com.yanzhenjie.permission:support:2.0.1"
     implementation project(':imsdk')//implementation 'com.startalk.im:sdk-im:3.0.7'
 }

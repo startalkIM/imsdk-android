@@ -124,16 +124,16 @@
                 android:textStyle="bold"
                 android:visibility="gone" />
 
-            <TextView
-                android:id="@+id/tv_original"
+            <RadioButton
+                android:id="@+id/rb_original"
                 android:layout_width="wrap_content"
                 android:layout_height="42dp"
                 android:layout_below="@+id/fl_fragment"
                 android:layout_centerInParent="true"
                 android:gravity="center"
                 android:text="@string/original_easy_photos"
-                android:textColor="@color/easy_photos_fg_primary"
-                android:textStyle="bold" />
+                android:checked="false"
+                android:textColor="@color/white_easy_photos" />
 
 
             <TextView
