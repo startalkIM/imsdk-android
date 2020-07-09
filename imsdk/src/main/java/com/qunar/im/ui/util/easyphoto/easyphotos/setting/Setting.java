@@ -37,7 +37,7 @@ public class Setting {
     public static boolean photoAdIsOk = false;
     public static boolean albumItemsAdIsOk = false;
     public static ArrayList<Photo> selectedPhotos = new ArrayList<>();
-    public static boolean showOriginalMenu = false;
+    public static boolean showOriginalMenu = true;
     public static boolean originalMenuUsable = false;
     public static String originalMenuUnusableHint = "";
     public static boolean selectedOriginal = false;

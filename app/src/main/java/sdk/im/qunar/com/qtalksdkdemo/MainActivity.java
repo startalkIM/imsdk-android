@@ -1,6 +1,5 @@
 package sdk.im.qunar.com.qtalksdkdemo;
 
-import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.os.Bundle;
@@ -10,13 +9,17 @@ import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import androidx.appcompat.app.AppCompatActivity;
+
 import com.qunar.im.common.CommonConfig;
 import com.qunar.im.ui.activity.TabMainActivity;
 import com.qunar.im.ui.sdk.QIMSdk;
 
+import sdk.im.qunar.com.qtalksdkdemo.permission.OnPermissionListener;
+import sdk.im.qunar.com.qtalksdkdemo.permission.PermissionX;
 
 
-public class MainActivity extends Activity {
+public class MainActivity extends AppCompatActivity {
 
     private Button autoLoginButton,startPlatForm;
     private TextView logcat_text;
@@ -49,7 +52,7 @@ public class MainActivity extends Activity {
      * @param view
      */
     public void configNavigation(View view) {
-        String url = "";//导航URl
+        String url = UserInfo.NAV;//导航URl
         if(TextUtils.isEmpty(url)){
             toast("请配置正确的导航地址");
             return;
@@ -75,8 +78,8 @@ public class MainActivity extends Activity {
                     toast(s);
                 });
             }else {
-                final String uid = "";//用户名
-                final String password = "";//密码
+                final String uid = UserInfo.UID;//用户名
+                final String password = UserInfo.PASSWORD;//密码
                 QIMSdk.getInstance().login(uid, password, (b, s) -> {
                     logcat_text.append("Uid：" + uid + "\n" + "Password：" + password);
                     pd.dismiss();
@@ -95,7 +98,25 @@ public class MainActivity extends Activity {
      * @param view
      */
     public void goToChat(View view){
-        QIMSdk.getInstance().goToChatConv(this,"jid",0);
+        PermissionX.with(this)
+                .storage()
+                .setPermissionListener(new OnPermissionListener() {
+                    @Override
+                    public void onDenied() {
+
+                    }
+
+                    @Override
+                    public void onGranted() {
+                        QIMSdk.getInstance().goToChatConv(MainActivity.this,"jid",0);
+                    }
+
+                    @Override
+                    public void onCancel() {
+
+                    }
+                })
+                .start();
     }
 
     /**

@@ -19,8 +19,10 @@ import android.view.WindowManager;
 import android.view.animation.AlphaAnimation;
 import android.view.animation.Animation;
 import android.view.animation.ScaleAnimation;
+import android.widget.CompoundButton;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.RadioButton;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -77,19 +79,20 @@ public class PreviewActivity extends AppCompatActivity implements PreviewPhotosA
     };
     private boolean mVisible;
     View decorView;
-    private TextView tvOriginal, tvNumber;
-    private PressedTextView tvDone;
-    private ImageView ivSelector;
-    private RecyclerView rvPhotos;
+    private TextView             tvNumber;
+    private RadioButton          rbOriginal;
+    private PressedTextView      tvDone;
+    private ImageView            ivSelector;
+    private RecyclerView         rvPhotos;
     private PreviewPhotosAdapter adapter;
-    private PagerSnapHelper snapHelper;
-    private LinearLayoutManager lm;
-    private int index;
-    private ArrayList<Photo> photos = new ArrayList<>();
-    private int resultCode = RESULT_CANCELED;
-    private int lastPosition = 0;//记录recyclerView最后一次角标位置，用于判断是否转换了item
-    private boolean isSingle = Setting.count == 1;
-    private boolean unable = Result.count() == Setting.count;
+    private PagerSnapHelper      snapHelper;
+    private LinearLayoutManager  lm;
+    private int                  index;
+    private ArrayList<Photo>     photos = new ArrayList<>();
+    private int                  resultCode = RESULT_CANCELED;
+    private int                  lastPosition = 0;//记录recyclerView最后一次角标位置，用于判断是否转换了item
+    private boolean              isSingle = Setting.count == 1;
+    private boolean              unable = Result.count() == Setting.count;
 
     private FrameLayout flFragment;
     private PreviewFragment previewFragment;
@@ -239,16 +242,23 @@ public class PreviewActivity extends AppCompatActivity implements PreviewPhotosA
         ivSelector = (ImageView) findViewById(R.id.iv_selector);
         tvNumber = (TextView) findViewById(R.id.tv_number);
         tvDone = (PressedTextView) findViewById(R.id.tv_done);
-        tvOriginal = (TextView) findViewById(R.id.tv_original);
+        rbOriginal =  findViewById(R.id.rb_original);
         flFragment = (FrameLayout) findViewById(R.id.fl_fragment);
         previewFragment = (PreviewFragment) getSupportFragmentManager().findFragmentById(R.id.fragment_preview);
         if (Setting.showOriginalMenu) {
             processOriginalMenu();
+            rbOriginal.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+                    Setting.selectedOriginal = !Setting.selectedOriginal;
+                    rbOriginal.setChecked(Setting.selectedOriginal);
+                }
+            });
         } else {
-            tvOriginal.setVisibility(View.GONE);
+            rbOriginal.setVisibility(View.GONE);
         }
 
-        setClick(tvOriginal, tvDone, ivSelector);
+        setClick( tvDone, ivSelector);
 
         initRecyclerView();
         shouldShowMenuDone();
@@ -302,13 +312,6 @@ public class PreviewActivity extends AppCompatActivity implements PreviewPhotosA
             doBack();
         } else if (R.id.tv_selector == id || R.id.iv_selector == id) {
             updateSelector();
-        } else if (R.id.tv_original == id) {
-            if (!Setting.originalMenuUsable) {
-                Toast.makeText(this, Setting.originalMenuUnusableHint, Toast.LENGTH_SHORT).show();
-                return;
-            }
-            Setting.selectedOriginal = !Setting.selectedOriginal;
-            processOriginalMenu();
         } else if (R.id.tv_done == id) {
             Intent intent = new Intent();
             intent.putExtra(Key.PREVIEW_CLICK_DONE, true);
@@ -324,12 +327,16 @@ public class PreviewActivity extends AppCompatActivity implements PreviewPhotosA
 
     private void processOriginalMenu() {
         if (Setting.selectedOriginal) {
-            tvOriginal.setTextColor(ContextCompat.getColor(this, R.color.easy_photos_fg_accent));
+            rbOriginal.setChecked(true);
+//            tvOriginal.setTextColor(ContextCompat.getColor(this, R.color.easy_photos_fg_accent));
         } else {
             if (Setting.originalMenuUsable) {
-                tvOriginal.setTextColor(ContextCompat.getColor(this, R.color.easy_photos_fg_primary));
+                rbOriginal.setChecked(false);
+//                tvOriginal.setTextColor(ContextCompat.getColor(this, R.color.easy_photos_fg_primary));
             } else {
-                tvOriginal.setTextColor(ContextCompat.getColor(this, R.color.easy_photos_fg_primary_dark));
+                rbOriginal.setChecked(false);
+                rbOriginal.setEnabled(false);
+//                tvOriginal.setTextColor(ContextCompat.getColor(this, R.color.easy_photos_fg_primary_dark));
             }
         }
     }

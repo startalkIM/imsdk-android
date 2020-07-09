@@ -92,6 +92,8 @@ import com.qunar.im.base.view.faceGridView.EmoticionMap;
 import com.qunar.im.base.view.faceGridView.EmoticonEntity;
 import com.qunar.im.common.CommonConfig;
 import com.qunar.im.common.CurrentPreference;
+import com.qunar.im.core.imgtool.Luban;
+import com.qunar.im.core.imgtool.OnCompressListener;
 import com.qunar.im.core.manager.IMLogicManager;
 import com.qunar.im.core.manager.IMPayManager;
 import com.qunar.im.core.services.QtalkNavicationService;
@@ -461,7 +463,7 @@ public class PbChatActivity extends SwipeBackActivity implements AtManager.AtTex
         setContentView(R.layout.atom_ui_activity_chat);
         connectionUtil = ConnectionUtil.getInstance();
         waterMarkTextUtil = new WaterMarkTextUtil();
-//        EventBus.getDefault().register(this);
+        EventBus.getDefault().register(this);
         //bugly tag
 //        CrashReportUtils.getInstance().setUserTag(55092);
         //处理一些额外的数据
@@ -824,8 +826,7 @@ public class PbChatActivity extends SwipeBackActivity implements AtManager.AtTex
      */
     public void onEventMainThread(EventBusEvent.NewPictureEdit edit) {
         if (!TextUtils.isEmpty(edit.mPicturePath)) {
-            imageUrl = edit.mPicturePath;
-            chatingPresenter.sendImage();
+            compressImageUrl(edit.mPicturePath,true);
         }
     }
 
@@ -2695,9 +2696,7 @@ public class PbChatActivity extends SwipeBackActivity implements AtManager.AtTex
 
     @Override
     public void sendEditPic(String path) {
-        imageUrl = path;
-//        imageUrl = edit.mPicturePath;
-        chatingPresenter.sendImage();
+        compressImageUrl(path,true);
 
     }
 
@@ -2970,7 +2969,7 @@ public class PbChatActivity extends SwipeBackActivity implements AtManager.AtTex
             } else {
                 imageUrl = data.getStringExtra("path");
                 if (!TextUtils.isEmpty(imageUrl)) {
-                    chatingPresenter.sendImage();
+                    compressImageUrl(imageUrl,true);
                 }
             }
 
@@ -2995,8 +2994,7 @@ public class PbChatActivity extends SwipeBackActivity implements AtManager.AtTex
                 ArrayList<ImageItem> images = (ArrayList<ImageItem>) data.getSerializableExtra(ImagePicker.EXTRA_RESULT_ITEMS);
                 if (images.size() > 0) {
                     for (ImageItem image : images) {
-                        imageUrl = image.path;
-                        chatingPresenter.sendImage();
+                        compressImageUrl(image.path,true);
                     }
                 }
             }
@@ -3303,6 +3301,36 @@ public class PbChatActivity extends SwipeBackActivity implements AtManager.AtTex
         }
     }
 
+
+    void compressImageUrl(String path,Boolean enableCompress){
+        if (!enableCompress){
+            imageUrl = path;
+            chatingPresenter.sendImage();
+            return;
+        }
+        Luban.with(getContext())
+                .load(path)
+                .setCompressListener(new OnCompressListener() {
+                    @Override
+                    public void onStart() {
+
+                    }
+
+                    @Override
+                    public void onSuccess(File file) {
+                        imageUrl = file.getAbsolutePath();
+                        chatingPresenter.sendImage();
+                    }
+
+                    @Override
+                    public void onError(Throwable e) {
+                        imageUrl = path;
+                        chatingPresenter.sendImage();
+                    }
+                })
+                .launch();
+    }
+
     void selectPic() {
 //        Intent intent1 = new Intent(this, PictureSelectorActivity.class);
 //        intent1.putExtra("isMultiSel", true);
@@ -3320,8 +3348,7 @@ public class PbChatActivity extends SwipeBackActivity implements AtManager.AtTex
                         if (paths.size() > 0) {
                             for (Photo image : photos) {
                                 if (image.type.startsWith("image")) {
-                                    imageUrl = image.path;
-                                    chatingPresenter.sendImage();
+                                    compressImageUrl(image.path,!isOriginal);
                                 } else if (image.type.startsWith("video")) {
 
 
@@ -3440,8 +3467,7 @@ public class PbChatActivity extends SwipeBackActivity implements AtManager.AtTex
                 photoPop = RecommendPhotoPop.recommendPhoto(PbChatActivity.this, total_bottom_layout, latestImage.path, new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
-                        imageUrl = latestImage.path;
-                        chatingPresenter.sendImage();
+                        compressImageUrl(imageUrl,true);
                         if (photoPop.isShowing())
                             photoPop.dismiss();
                     }
@@ -3648,7 +3674,7 @@ public class PbChatActivity extends SwipeBackActivity implements AtManager.AtTex
                 imageUrl = entity.fileOrg;
             }
             if (imageUrl != null) {
-                chatingPresenter.sendImage();
+                compressImageUrl(imageUrl,true);
             }
         }
     }
